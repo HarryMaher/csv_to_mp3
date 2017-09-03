@@ -32,7 +32,7 @@ drag to my watch and dumb phone so I can listen to a couple new songs while out
 4. Run this "python csv_to_mp3.py" (may take about a minute per song)
 5. Drag the music to your offline device, and enjoy!
 
-Note: It really only works for fairly popular songs that are on youtube...
+Note: It really only works for fairly popular songs that are on youtube.
 
 
 todo:
@@ -52,41 +52,20 @@ import youtube_dl
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import time
 
-songs = pd.read_csv("songs.csv")
-url = 'https://www.youtube.com/results?search_query='
-yt_link = 'http://www.youtube.com'
-all_vids = []
+songs_csv = "songs.csv"
 
-def get_div(url):
+def get_href(url):
     response = requests.get(url)
     content = response.content
     soup = BeautifulSoup(content, "lxml")
-    # Just takes the second link -- the first could be an ad.
+    # Get all the links to videos, because the first might be an ad
     tag = [a['href'] for a in soup.find_all("a", {'class', 'yt-uix-tile-link'}, text=True)]
-    # Sleep because servers don't like scrapers
-    time.sleep(3)
     return tag
 
 
-def main():
-    i=0
-    while i<len(songs["song"]):
-        this_song = songs["song"][i]+ songs["artist"][i]
-        this_song = "+".join(this_song.strip().split())
-        div = get_div(url+this_song)
-        # sometimes the first is an ad and ads start with 'https://...'
-        if not "https" in div[0]:
-            link_ext = div[0]
-        else:
-            link_ext = div[1]
-        complete_link = yt_link+link_ext
-        print(i, complete_link)
-        all_vids.append(complete_link)
-        i+=1
-
-    # d/l settings
+def yt_dler(vid_link):
+	# d/l settings
     ydl_opts = {
         'format': 'bestaudio/best',
         'postprocessors': [{
@@ -96,15 +75,28 @@ def main():
         }],
         'quiet': True,
         'restrictfilenames': True}
-
     ydl = youtube_dl.YoutubeDL(ydl_opts)
+    ydl.download([vid_link])
 
 
-    for vid in all_vids:
-        ydl.download([vid])
-        # sleep more because servers don't like scrapers
-        time.sleep(3)
-
+def main():
+	songs = pd.read_csv(songs_csv)
+	search_url = 'https://www.youtube.com/results?search_query='
+	yt_link = 'http://www.youtube.com'
+	i=0
+	while i<len(songs["song"]):
+		this_song = songs["song"][i]+" "+ songs["artist"][i]
+		this_search = "+".join(this_song.strip().split())
+		div = get_href(search_url+this_search)
+		# sometimes the first is an ad and ads start with 'https://...'
+		if "https" not in div[0]:
+			link_ext = div[0]
+		else:
+			link_ext = div[1]
+		complete_link = yt_link+link_ext
+		print(i, this_song, complete_link)
+		yt_dler(complete_link)
+		i+=1
 
 if __name__ == "__main__":
     main()
