@@ -1,23 +1,23 @@
 # csv to mp3 #
 
-### Description: ###
+### *Description:* ###
 
-This simple script takes a .csv list of popular song titles and artist names
-and searches youtube for that song, grabs the first link that isn't an ad and
-downloads the video and converts it to mp3 using youtube-dl/ffmpeg.
+This script takes a .csv file that contains a list of song titles and artist 
+names, searches youtube for those songs, grabs links to the songs, and 
+downloads videos and converts them to mp3 format.
 
-So you can listen to these songs off the [internet] grid!
+Allows you to listen to these songs when you don't have internet!
 
 *Not to be used to download music illegally!*
-*Please follow local copyright law & support artists!!*
+*Please follow local copyright law & support artists*
 
-### Why: ###
+### *Why:* ###
 Sometimes you don't have an internet connection and this is is an easy & lazy
-way to download a couple of offline songs w/o worrying about torrenting
-individual songs or using youtube2mp3 for each individual song.
+way to download a couple of songs w/o worrying about looking for torrents for
+individual songs or tediously going through a list of songs w/ youtube2mp3.
 
-Not recommended for building a large library - made for getting a few songs to
-drag to my watch and dumb phone so I can listen to a couple new songs while out
+Not recommended for building a large library--made for getting ~5-15 new songs
+to drag to an mp3 player to before going on a run or bike ride
 
 ### *Instructions:* ###
 
@@ -32,4 +32,4 @@ $ git clone https://github.com/HarryMaher/csv_to_mp3.git
 4. Run this "python csv_to_mp3.py" (may take about a minute per song)
 5. Drag the music to your offline device, and enjoy!
 
-Note: It really only works for fairly popular songs that are on youtube...
+Note: It really only works for decently popular songs on youtube

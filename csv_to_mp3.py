@@ -16,7 +16,7 @@ Sometimes you don't have an internet connection and this is is an easy & lazy
 way to download a couple of offline songs w/o worrying about torrenting
 individual songs or using youtube2mp3 for each individual song.
 
-Not recommended for building a large library - made for getting a few songs to
+Not recommended for building a large library - intended for getting a few songs to
 drag to my watch and dumb phone so I can listen to a couple new songs while out
 
 *Not to be used to download music illegally!*
@@ -88,7 +88,7 @@ def main():
 		this_song = songs["song"][i]+" "+ songs["artist"][i]
 		this_search = "+".join(this_song.strip().split())
 		div = get_href(search_url+this_search)
-		# sometimes the first is an ad and ads start with 'https://...'
+		# sometimes the first is an ad and ads start with 'https...' whereas genuine video links are just the "/asDFeG4BLaH" 
 		if "https" not in div[0]:
 			link_ext = div[0]
 		else:
