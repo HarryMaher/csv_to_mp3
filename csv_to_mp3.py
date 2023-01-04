@@ -51,21 +51,29 @@ all below modules (youtube_dl, pandas, bs4) - install w/ "pip3 install youtube_d
 import youtube_dl
 import pandas as pd
 import requests
-from bs4 import BeautifulSoup
+#from bs4 import BeautifulSoup
 
 songs_csv = "songs.csv"
 
+
+
 def get_href(url):
     response = requests.get(url)
-    content = response.content
-    soup = BeautifulSoup(content, "lxml")
+    content = response.content.__str__()
+    # implemented without soup to make it working in 2023 , the below code searches the first youtube search url of 12 characters  in to the content string
+    #soup = BeautifulSoup(content, "lxml")
     # Get all the links to videos, because the first might be an ad
-    tag = [a['href'] for a in soup.find_all("a", {'class', 'yt-uix-tile-link'}, text=True)]
+    #tag = [a['href'] for a in soup.find_all("a", {'class', 'yt-uix-tile-link'}, text=True)]
+
+    # Get the link to first video
+    start = content.find('"/watch?v=') + 9
+    end = start + 12
+    tag: str = '/watch?v' + content[start:end]
     return tag
 
 
 def yt_dler(vid_link):
-	# d/l settings
+    # d/l settings
     ydl_opts = {
         'format': 'bestaudio/best',
         'postprocessors': [{
@@ -80,23 +88,31 @@ def yt_dler(vid_link):
 
 
 def main():
-	songs = pd.read_csv(songs_csv)
-	search_url = 'https://www.youtube.com/results?search_query='
-	yt_link = 'http://www.youtube.com'
-	i=0
-	while i<len(songs["song"]):
-		this_song = songs["song"][i]+" "+ songs["artist"][i]
-		this_search = "+".join(this_song.strip().split())
-		div = get_href(search_url+this_search)
-		# sometimes the first is an ad and ads start with 'https...' whereas genuine video links are just the "/asDFeG4BLaH" 
-		if "https" not in div[0]:
-			link_ext = div[0]
-		else:
-			link_ext = div[1]
-		complete_link = yt_link+link_ext
-		print(i, this_song, complete_link)
-		yt_dler(complete_link)
-		i+=1
+    songs = pd.read_csv(songs_csv)
+    search_url = 'https://www.youtube.com/results?search_query='
+    yt_link = 'http://www.youtube.com'
+    i=0
+    exception: str = ''
 
+    while i<len(songs["song"]):
+        this_song = songs["song"][i]+" "+ songs["artist"][i]
+        this_search = "+".join(this_song.strip().split())
+        div = get_href(search_url+this_search)
+        # sometimes the first is an ad and ads start with 'https...' whereas genuine video links are just the "/asDFeG4BLaH"
+        #if "https" not in div[0]:
+            #link_ext = div[0]
+        #else:
+            #link_ext = div[1]
+        # div would have desired url as returned by get_href , so above 4 lines are commented
+        complete_link = yt_link+div
+        print(i, this_song, complete_link)
+        # exception handling such as age restricted video would not download and  to avoid interruption exception handling
+        try :
+            yt_dler(complete_link)
+        except:
+            exception = exception + complete_link + "\n"
+        i+=1
+    # Write the url of video which was not automatically downloaded with script to output.txt
+    print(exception, file=open('output.txt', 'w'))
 if __name__ == "__main__":
     main()
